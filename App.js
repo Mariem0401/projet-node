@@ -5,7 +5,7 @@ const dotenv =require('dotenv')
 dotenv.config({path:"./config.env"});
 const  mongoose =require('mongoose');
 const userRoutes = require("./routes/userRoutes");
-
+const productRoutes = require("./routes/productRoutes");
 App.use(express.json());
 
 const port = 7777 //num de port
@@ -15,6 +15,7 @@ App.listen(port,()=>{
 }
 ); 
 App.use('/users', userRoutes);
+App.use("/products", productRoutes);
 // connect to the data base 
 const DB = process.env.DATABASE.replace("<db_password>",process.env.DATABASE_PASSWORD);
 mongoose
