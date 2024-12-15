@@ -5,12 +5,16 @@ const {
   deleteUser,
   getAllUsers,
   getUserById,
-  updateUser,
+  updateUser, 
 } = require("../Controller/userController");
-const { signup ,login } = require("../Controller/authController");
+const { signup ,login , protectionMW, howCanDo} = require("../Controller/authController");
 
-router.route("/").post(createUser).get(getAllUsers);
-router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser);
-router.route("/signUp").post(signup);
+router.route("/signup").post(signup);
 router.route("/login").post(login);
+router.route("/").post(protectionMW, createUser).get(protectionMW, getAllUsers);
+router
+  .route("/:id")
+  .get(protectionMW, howCanDo("admin", "user"), getUserById)
+  .patch(protectionMW, updateUser)
+  .delete(protectionMW, howCanDo("admin"), deleteUser);
 module.exports = router;

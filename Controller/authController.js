@@ -1,5 +1,9 @@
 const User = require("../Model/userModel");
 const jwt = require("jsonwebtoken");
+
+const { promisify } = require("util");
+
+
 const createToken=(name,id )=>
     {
          return jwt.sign({name,id }, 
@@ -10,10 +14,13 @@ const createToken=(name,id )=>
     }
 exports.signup = async (req, res) => {
     try {
-        const { name,email,password,confirmPassword,age}= req.body
-      const newUser = await User.create({
+        const { name,email,role,password,confirmPassword,age}= req.body
+        console.log("create ");
+        const newUser = await User.create({
+        
         name , 
         email,
+        role,
         password ,
         confirmPassword,
         age 
@@ -24,7 +31,7 @@ exports.signup = async (req, res) => {
       });
     } catch (err) {
       res.status(400).json({
-        status: "fail   hkjhkjhjhhjlhjh",
+        status: "fail ",
         message: err,
       });
     }
@@ -56,12 +63,76 @@ res.status(200).json({
 
 });
 }
-
-
  catch (err) {
       res.status(400).json({
         status: "fail   hkjhkjhjhhjlhjh",
         message: err,
       });
     }
+  };
+  exports.protectionMW = async (req, res, next) => {
+    try {
+      let token;
+      // 1) thabat si el user connecter ou bien non
+      if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")
+      ) {
+        token = req.headers.authorization.split(" ")[1];
+      }
+      if (!token) {
+        return res.status(401).json({
+          status: "fail",
+          message: "you have to be logged in !!!!",
+        });
+      }
+      // 2) thabat si el token valid ou bien lé
+  
+      let myToken = await promisify(jwt.verify)(token, process.env.SECRET_KEY);
+      console.log(myToken);
+  
+      // 3) thabat el user mizel mawjoub ou bien lé
+      const myUser = await User.findById(myToken.id);
+      if (!myUser) {
+        return res.status(401).json({
+          status: "fail",
+          message: "User is no longer exists !!!!",
+        });
+      }
+      // 4) thabt si el user badal el pass mte3ou ba3d ma sna3 el token ou bien lé
+  
+      if (myUser.validTokenDate(myToken.iat)) {
+        return res.status(401).json({
+          status: "fail",
+          message: "token no longer valid !!!!",
+        });
+      }
+      req.user = myUser;
+      next();
+    } catch (error) {
+      res.status(400).json({
+        status: "fail",
+        message: error,
+      });
+    }
+  };
+  
+  exports.howCanDo = (...roles) => {
+    return async (req, res, next) => {
+      try {
+        console.log(roles);
+        if (!roles.includes(req.user.role)) {
+          return res.status(401).json({
+            status: "fail",
+            message: "you can not do this !!!!",
+          });
+        }
+        next();
+      } catch (error) {
+        res.status(400).json({
+          status: "fail",
+          message: error,
+        });
+      }
+    };
   };

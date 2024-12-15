@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, "La catégorie du produit est obligatoire"],
-    enum: ["PC", "Smartphone", "Smartwatch", "Accessoire", "Autre"], // Définir les catégories autorisées
+    enum: ["PC", "Smartphone", "Smartwatch", "Accessoire","Smart Tv" ,"Autre"], // Définir les catégories autorisées
   },
   createdAt: { type: Date, default: Date.now },
 });

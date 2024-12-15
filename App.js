@@ -4,9 +4,16 @@ const fs = require('fs')
 const dotenv =require('dotenv')
 dotenv.config({path:"./config.env"});
 const  mongoose =require('mongoose');
+const path = require('path'); // Importer path pour gérer les chemins
+
+
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+// Middleware pour parser les requêtes JSON
 App.use(express.json());
+
+// === Servir les fichiers statiques du dossier frontend ===
+App.use(express.static(path.join(__dirname, "../frontend")));
 
 const port = 7777 //num de port
 App.listen(port,()=>{
@@ -27,39 +34,3 @@ mongoose
 .catch((err) => {
     console.log(err);
 });
-
-
-
-/*App.get('/msg', (req,res) => 
-    {    res.send("This message from the server ")});
-//App.listen(8080, () => {    console.log("Serveur à l'écoute")})
-App.use(express.json());
-
-var spec = JSON.parse(fs.readFileSync('./spec.json','utf-8'))  /*  lire le fichier */
-/*App.get('/spec', (req,res) => {    
-    res.status(200).json({
-    
-    
-        status:"sucess", 
-        resultat:spec.length ,
-        data :{spec,},
-    }
-    )});
-
-/*App.post("/spec",(req,res)=>{
-console.log(req.body);
-res.send("aaaaa")*/
-
-/*const id =spec[spec.length -1 ].id+1;
-const newspec= Object.assign({id:id}, req.body)
-spec.push(newspec);
-fs.writeFile('./spec.json',JSON.stringify(spec),err=> {
-    res.status(201).json({
-        status:"sucess", 
-        newspec ,
-    })
-})
-});*/
-
-
-
